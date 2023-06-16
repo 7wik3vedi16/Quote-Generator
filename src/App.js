@@ -1,25 +1,54 @@
-import logo from './logo.svg';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import './App.css';
+import QuoteGenerator from './QuoteGenerator';
+import QuoteDisplay from './QuoteDisplay';
 
-function App() {
+const App = () => {
+  const [quote, setQuote] = useState('');
+  const [pageColor, setPageColor] = useState('');
+  const [buttonColor, setButtonColor] = useState('');
+  const [quoteColor,setQuoteColor]=useState('');
+
+  useEffect(() => {
+    fetchQuote();
+    setPageColor(generateRandomColor());
+    setButtonColor(generateRandomColor());
+    setQuoteColor(generateRandomColor());
+  }, []);
+
+  const fetchQuote = () => {
+    axios
+      .get('https://api.quotable.io/random')
+      .then((response) => {
+        setQuote(response.data.content);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  const generateRandomColor = () => {
+    return '#' + Math.floor(Math.random() * 16777215).toString(16);
+  };
+
+  const handleButtonClick = () => {
+    fetchQuote();
+    setPageColor(generateRandomColor());
+    setButtonColor(generateRandomColor());
+    setQuoteColor(generateRandomColor());
+  };
+  
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="app" style={{ backgroundColor: pageColor }}>
+      <div className="container">
+        <h1 className="title">Want Another One</h1>
+        <QuoteGenerator onClick={handleButtonClick} buttonColor={buttonColor} />
+        <QuoteDisplay quote={quote} quoteColor={quoteColor} />
+      </div>
     </div>
   );
-}
+};
 
 export default App;
